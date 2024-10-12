@@ -1,0 +1,9 @@
+{
+  "platforms": ["ios", "tvos", "android", "web"],
+  "ios": {
+    "modules": ["NativeCalendarModule"]
+  },
+  "android": {
+    "modules": ["com.thm.nativecalendar.NativeCalendarModule"]
+  }
+}

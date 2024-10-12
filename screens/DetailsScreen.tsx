@@ -5,6 +5,7 @@ import { RootStackParamList } from '../navigation';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 import MapView, { Marker } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
+import { hello } from '../modules/native-calendar';
 
 type DetailScreenRouteProp = RouteProp<RootStackParamList, 'Detail'>;
 
@@ -19,6 +20,7 @@ const DetailScreen: React.FC = () => {
   const handleAddToCalendar = (date: string) => {
     // TODO: Implement calendar integration
     console.log(`Add to calendar: ${date}`);
+    console.log(hello());
   };
 
   return (

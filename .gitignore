@@ -11,10 +11,13 @@ npm-debug.*
 web-build/
 
 
+/ios
+/android
 
+# Include modules/native-calendar/ios and android
 
-ios
-android
+!modules/**/ios
+!modules/**/android
 
 # macOS
 .DS_Store
