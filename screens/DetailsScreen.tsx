@@ -19,6 +19,8 @@ const DetailScreen: React.FC = () => {
 
   const handleAddToCalendar = async (date: string) => {
     try {
+
+      
       const hasPermission = await NativeCalendar.requestPermissions();
       if (!hasPermission) {
         Alert.alert('Permission Denied', 'Calendar permission is required to add events.');
@@ -41,6 +43,41 @@ const DetailScreen: React.FC = () => {
       Alert.alert('Error', `Failed to add event to calendar: ${errorMessage}`);
       console.error('Calendar error:', error);
     }
+  };
+
+  const renderMapSection = () => {
+    if (Platform.OS === 'ios') {
+      return (
+        <>
+         <Animated.Text entering={FadeInDown.duration(600).delay(400)} style={styles.subtitle}>
+            Location
+          </Animated.Text>
+          <Animated.View 
+            entering={FadeInDown.duration(600).delay(500)}
+            style={styles.mapContainer}
+          >
+            <MapView
+              style={styles.map}
+              initialRegion={{
+                latitude: destination.location.latitude,
+                longitude: destination.location.longitude,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421,
+              }}
+            >
+              <Marker
+                coordinate={{
+                  latitude: destination.location.latitude,
+                  longitude: destination.location.longitude,
+                }}
+                title={destination.name}
+              />
+            </MapView>
+          </Animated.View>
+        </>
+      );
+    }
+    return null;
   };
 
   return (
@@ -68,31 +105,7 @@ const DetailScreen: React.FC = () => {
           <Animated.Text entering={FadeInDown.duration(600).delay(200)} style={styles.description}>
             {destination.description}
           </Animated.Text>
-          <Animated.Text entering={FadeInDown.duration(600).delay(400)} style={styles.subtitle}>
-            Location
-          </Animated.Text>
-          <Animated.View 
-            entering={FadeInDown.duration(600).delay(500)}
-            style={styles.mapContainer}
-          >
-            <MapView
-              style={styles.map}
-              initialRegion={{
-                latitude: destination.location.latitude,
-                longitude: destination.location.longitude,
-                latitudeDelta: 0.0922,
-                longitudeDelta: 0.0421,
-              }}
-            >
-              <Marker
-                coordinate={{
-                  latitude: destination.location.latitude,
-                  longitude: destination.location.longitude,
-                }}
-                title={destination.name}
-              />
-            </MapView>
-          </Animated.View>
+          {renderMapSection()}
           <Animated.Text entering={FadeInDown.duration(600).delay(600)} style={styles.subtitle}>
             Suggested Travel Dates
           </Animated.Text>

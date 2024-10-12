@@ -32,7 +32,7 @@
         "latitude": -18.2871,
         "longitude": 147.6992
       },
-      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Great_Barrier_Reef_Biodiversity.jpg/1280px-Great_Barrier_Reef_Biodiversity.jpg",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/4/4f/ISS-45_StoryOfWater%2C_Great_Barrier_Reef%2C_Australia.jpg",
       "description": "World's largest coral reef system off the coast of Queensland, Australia, home to diverse marine life and vibrant coral formations.",
       "suggestedTravelDates": [
         "2025-05-01",
@@ -45,7 +45,7 @@
         "latitude": 36.3932,
         "longitude": 25.4615
       },
-      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Santorini_Sunset.jpg/1280px-Santorini_Sunset.jpg",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Oia_sunset_-_panoramio_%282%29.jpg/2880px-Oia_sunset_-_panoramio_%282%29.jpg",
       "description": "Picturesque Greek island known for its stunning sunsets, white-washed buildings, and blue-domed churches overlooking the Aegean Sea.",
       "suggestedTravelDates": [
         "2025-05-20",
@@ -245,19 +245,6 @@
       "suggestedTravelDates": [
         "2025-03-01",
         "2025-04-30"
-      ]
-    },
-    {
-      "name": "Petra",
-      "location": {
-        "latitude": 30.3285,
-        "longitude": 35.4444
-      },
-      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/The_Monastery%2C_Petra%2C_Jordan8.jpg/1280px-The_Monastery%2C_Petra%2C_Jordan8.jpg",
-      "description": "Ancient city in southern Jordan famous for its rock-cut architecture, especially the iconic Treasury facade.",
-      "suggestedTravelDates": [
-        "2025-03-15",
-        "2025-11-15"
       ]
     },
     {

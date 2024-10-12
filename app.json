@@ -1,9 +1,9 @@
 {
   "expo": {
     "name": "TravelGuide",
-    "slug": "TravelGuide",
+    "slug": "travelguide",
     "version": "1.0.0",
-    "sdkVersion": "49.0.0",
+    "sdkVersion": "51.0.0",
     "web": {
       "favicon": "./assets/favicon.png"
     },
@@ -42,6 +42,12 @@
         "android.permission.READ_CALENDAR",
         "android.permission.WRITE_CALENDAR"
       ]
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "f059154c-e1bd-4abc-857e-01c29a9e4155"
+      }
+    },
+    "owner": "elliot.thm"
   }
 }
