@@ -1,44 +1,58 @@
 import ExpoModulesCore
+import EventKit
 
 public class NativeCalendarModule: Module {
-  // Each module class must implement the definition function. The definition consists of components
-  // that describes the module's functionality and behavior.
-  // See https://docs.expo.dev/modules/module-api for more details about available components.
+  private let eventStore = EKEventStore()
+
   public func definition() -> ModuleDefinition {
-    // Sets the name of the module that JavaScript code will use to refer to the module. Takes a string as an argument.
-    // Can be inferred from module's class name, but it's recommended to set it explicitly for clarity.
-    // The module will be accessible from `requireNativeModule('NativeCalendar')` in JavaScript.
     Name("NativeCalendar")
 
-    // Sets constant properties on the module. Can take a dictionary or a closure that returns a dictionary.
-    Constants([
-      "PI": Double.pi
-    ])
-
-    // Defines event names that the module can send to JavaScript.
-    Events("onChange")
-
-    // Defines a JavaScript synchronous function that runs the native code on the JavaScript thread.
-    Function("hello") {
-      return "Hello world! 👋"
+    AsyncFunction("requestPermissions") { (promise: Promise) in
+        if #available(iOS 17.0, *) {
+            self.eventStore.requestFullAccessToEvents { granted, error in
+                if let error = error {
+                    promise.reject(error)
+                } else {
+                    promise.resolve(granted)
+                }
+            }
+        } else {
+            self.eventStore.requestAccess(to: .event) { granted, error in
+                if let error = error {
+                    promise.reject(error)
+                } else {
+                    promise.resolve(granted)
+                }
+            }
+        }
     }
 
-    // Defines a JavaScript function that always returns a Promise and whose native code
-    // is by default dispatched on the different thread than the JavaScript runtime runs on.
-    AsyncFunction("setValueAsync") { (value: String) in
-      // Send an event to JavaScript.
-      self.sendEvent("onChange", [
-        "value": value
-      ])
-    }
+    AsyncFunction("addEvent") { (title: String, location: String, startDateString: String, endDateString: String, promise: Promise) in
+        
+           let dateFormatter = ISO8601DateFormatter()
+           
+           guard let startDate = dateFormatter.date(from: startDateString),
+                 let endDate = dateFormatter.date(from: endDateString) else {
+               promise.reject(NSError(domain: "NativeCalendarError", code: 1, userInfo: [NSLocalizedDescriptionKey: "Invalid date format"]))
+               return
+           }
+        
+          let event = EKEvent(eventStore: self.eventStore)
+          event.title = title
+          event.location = location
+          event.startDate = startDate
+          event.endDate = endDate
+          event.calendar = self.eventStore.defaultCalendarForNewEvents
 
-    // Enables the module to be used as a native view. Definition components that are accepted as part of the
-    // view definition: Prop, Events.
-    View(NativeCalendarView.self) {
-      // Defines a setter for the `name` prop.
-      Prop("name") { (view: NativeCalendarView, prop: String) in
-        print(prop)
-      }
+          let alarm = EKAlarm(relativeOffset: -86400) // 1 day before
+          event.addAlarm(alarm)
+
+          do {
+            try self.eventStore.save(event, span: .thisEvent)
+              promise.resolve(event.eventIdentifier)
+          } catch {
+              promise.reject(error)
+          }
     }
   }
 }

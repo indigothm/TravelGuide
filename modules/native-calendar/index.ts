@@ -1,26 +1,51 @@
-import { NativeModulesProxy, EventEmitter, Subscription } from 'expo-modules-core';
+import { requireNativeModule } from 'expo-modules-core';
 
-// Import the native module. On web, it will be resolved to NativeCalendar.web.ts
-// and on native platforms to NativeCalendar.ts
-import NativeCalendarModule from './src/NativeCalendarModule';
-import NativeCalendarView from './src/NativeCalendarView';
-import { ChangeEventPayload, NativeCalendarViewProps } from './src/NativeCalendar.types';
+const NativeCalendarModule = requireNativeModule('NativeCalendar');
 
-// Get the native constant value.
-export const PI = NativeCalendarModule.PI;
-
-export function hello(): string {
-  return NativeCalendarModule.hello();
+export interface CalendarEvent {
+  title: string;
+  location: string;
+  startDate: Date;
+  endDate: Date;
 }
 
-export async function setValueAsync(value: string) {
-  return await NativeCalendarModule.setValueAsync(value);
+function formatDateToISO8601(date: Date): string {
+  return date.toISOString().split('.')[0] + 'Z';
 }
 
-const emitter = new EventEmitter(NativeCalendarModule ?? NativeModulesProxy.NativeCalendar);
+export default {
+  async requestPermissions() {
+    console.log('Requesting calendar permissions...');
+    try {
+      const result = await NativeCalendarModule.requestPermissions();
+      console.log('Permission request result:', result);
+      return result;
+    } catch (error) {
+      console.error('Error requesting calendar permissions:', error);
+      throw error;
+    }
+  },
 
-export function addChangeListener(listener: (event: ChangeEventPayload) => void): Subscription {
-  return emitter.addListener<ChangeEventPayload>('onChange', listener);
-}
-
-export { NativeCalendarView, NativeCalendarViewProps, ChangeEventPayload };
+  async addEvent(event: CalendarEvent) {
+    console.log('Adding event to calendar:', event);
+    const { title, location, startDate, endDate } = event;
+    try {
+      const formattedStartDate = formatDateToISO8601(startDate);
+      const formattedEndDate = formatDateToISO8601(endDate);
+      console.log('Formatted start date:', formattedStartDate);
+      console.log('Formatted end date:', formattedEndDate);
+      
+      const result = await NativeCalendarModule.addEvent(
+        title,
+        location,
+        formattedStartDate,
+        formattedEndDate
+      );
+      console.log('Event added successfully:', result);
+      return result;
+    } catch (error) {
+      console.error('Error adding event to calendar:', error);
+      throw error;
+    }
+  },
+};

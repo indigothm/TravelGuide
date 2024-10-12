@@ -83,7 +83,6 @@ const HomeScreen: React.FC = () => {
   );
 
   return (
-    <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <Animated.View style={[styles.header, headerAnimatedStyle]}>
           <Animated.Text 
@@ -93,6 +92,7 @@ const HomeScreen: React.FC = () => {
             Travel Destinations
           </Animated.Text>
         </Animated.View>
+
         <Animated.FlatList
           data={destinations}
           renderItem={renderDestinationItem}
@@ -103,7 +103,6 @@ const HomeScreen: React.FC = () => {
           scrollEventThrottle={16}
         />
       </View>
-    </SafeAreaView>
   );
 };
 

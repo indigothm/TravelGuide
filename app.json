@@ -10,7 +10,9 @@
     "experiments": {
       "tsconfigPaths": true
     },
-    "plugins": [],
+    "plugins": [
+      "./modules/native-calendar/app.plugin.js"
+    ],
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -24,14 +26,22 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.thm.TravelGuide"
+      "bundleIdentifier": "com.thm.TravelGuide",
+      "infoPlist": {
+        "NSCalendarsUsageDescription": "This app needs access to your calendar to add travel events.",
+        "NSCalendarsFullAccessUsageDescription": "This app needs access to your calendar to add travel events."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.thm.TravelGuide"
+      "package": "com.thm.TravelGuide",
+      "permissions": [
+        "android.permission.READ_CALENDAR",
+        "android.permission.WRITE_CALENDAR"
+      ]
     }
   }
 }

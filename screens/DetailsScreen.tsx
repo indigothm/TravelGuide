@@ -1,11 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity, Dimensions, Platform, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity, Dimensions, Platform, StatusBar, Alert } from 'react-native';
 import { RouteProp, useRoute, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../navigation';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 import MapView, { Marker } from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
-import { hello } from '../modules/native-calendar';
+import NativeCalendar, { CalendarEvent } from '../modules/native-calendar';
 
 type DetailScreenRouteProp = RouteProp<RootStackParamList, 'Detail'>;
 
@@ -17,10 +17,30 @@ const DetailScreen: React.FC = () => {
   const navigation = useNavigation();
   const { destination } = route.params;
 
-  const handleAddToCalendar = (date: string) => {
-    // TODO: Implement calendar integration
-    console.log(`Add to calendar: ${date}`);
-    console.log(hello());
+  const handleAddToCalendar = async (date: string) => {
+    try {
+      const hasPermission = await NativeCalendar.requestPermissions();
+      if (!hasPermission) {
+        Alert.alert('Permission Denied', 'Calendar permission is required to add events.');
+        return;
+      }
+  
+      const [startDate, endDate] = date.split(' - ').map(d => new Date(d));
+  
+      const event: CalendarEvent = {
+        title: `Trip to ${destination.name}`,
+        location: destination.name,
+        startDate,
+        endDate: endDate || new Date(startDate.getTime() + 24 * 60 * 60 * 1000), 
+      };
+  
+      await NativeCalendar.addEvent(event);
+      Alert.alert('Success', `Event added to calendar for ${date}`);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      Alert.alert('Error', `Failed to add event to calendar: ${errorMessage}`);
+      console.error('Calendar error:', error);
+    }
   };
 
   return (
