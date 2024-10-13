@@ -48,4 +48,16 @@ export default {
       throw error;
     }
   },
+
+  async deleteEvent(eventId: string) {
+    console.log('Deleting event from calendar:', eventId);
+    try {
+      const result = await NativeCalendarModule.deleteEvent(eventId);
+      console.log('Event deleted successfully:', result);
+      return result;
+    } catch (error) {
+      console.error('Error deleting event from calendar:', error);
+      throw error;
+    }
+  },
 };

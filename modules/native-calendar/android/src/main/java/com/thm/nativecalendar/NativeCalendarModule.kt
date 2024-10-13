@@ -10,6 +10,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
 import androidx.core.app.ActivityCompat
+import android.content.ContentUris
 
 
 class NativeCalendarModule : Module() {
@@ -71,11 +72,26 @@ class NativeCalendarModule : Module() {
           appContext.reactContext?.contentResolver?.insert(CalendarContract.Reminders.CONTENT_URI, reminderValues)
           promise.resolve(eventId)
         } else {
-          //promise.reject("EVENT_ADD_FAILED", "Failed to add event")
+           promise.reject("EVENT_ADD_FAILED", "Failed to add event", Exception("Event ID is null"))
         }
       } catch (e: Exception) {
         promise.reject("EVENT_ADD_ERROR", e.message ?: "Unknown error", e)
       }
+    }
+
+    AsyncFunction("deleteEvent") { eventId: String, promise: Promise ->
+        try {
+            val deleteUri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, eventId.toLong())
+            val rows = appContext.reactContext?.contentResolver?.delete(deleteUri, null, null)
+            
+            if (rows != null && rows > 0) {
+                promise.resolve(true)
+            } else {
+               promise.reject("EVENT_DELETE_FAILED", "Failed to delete event", Exception("No rows affected"))
+            }
+        } catch (e: Exception) {
+            promise.reject("EVENT_DELETE_ERROR", e.message ?: "Unknown error", e)
+        }
     }
   }
 

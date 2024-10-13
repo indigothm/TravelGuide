@@ -54,5 +54,19 @@ public class NativeCalendarModule: Module {
               promise.reject(error)
           }
     }
+
+    AsyncFunction("deleteEvent") { (eventId: String, promise: Promise) in
+        guard let event = self.eventStore.event(withIdentifier: eventId) else {
+            promise.reject(NSError(domain: "NativeCalendarError", code: 2, userInfo: [NSLocalizedDescriptionKey: "Event not found"]))
+            return
+        }
+
+        do {
+            try self.eventStore.remove(event, span: .thisEvent)
+            promise.resolve(true)
+        } catch {
+            promise.reject(error)
+        }
+    }
   }
 }

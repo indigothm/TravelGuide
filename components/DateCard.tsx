@@ -6,13 +6,14 @@ interface DateCardProps {
   date: string;
   index: number;
   onPress: () => void;
+  isAdded: boolean;
 }
 
-const DateCard: React.FC<DateCardProps> = ({ date, index, onPress }) => (
+const DateCard: React.FC<DateCardProps> = ({ date, index, onPress, isAdded }) => (
   <Animated.View entering={FadeInDown.duration(600).delay(700 + index * 100)}>
     <TouchableOpacity style={styles.dateCard} onPress={onPress}>
       <Text style={styles.dateText}>{date}</Text>
-      <Text style={styles.addToCalendarText}>Add to Calendar</Text>
+      <Text style={styles.addToCalendarText}>{isAdded ? 'Added to Calendar' : 'Add to Calendar'}</Text>
     </TouchableOpacity>
   </Animated.View>
 );

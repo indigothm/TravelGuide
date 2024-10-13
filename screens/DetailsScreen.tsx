@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity, Dimensions, Platform, StatusBar, Alert } from 'react-native';
 import { RouteProp, useRoute, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../navigation';
@@ -7,6 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import NativeCalendar, { CalendarEvent } from '../modules/native-calendar';
 import LocationMap from '../components/LocationMap';
 import DateCard from '../components/DateCard';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type DetailScreenRouteProp = RouteProp<RootStackParamList, 'Detail'>;
 
@@ -17,6 +18,30 @@ const DetailScreen: React.FC = () => {
   const route = useRoute<DetailScreenRouteProp>();
   const navigation = useNavigation();
   const { destination } = route.params;
+  const [addedEvents, setAddedEvents] = useState<{ [key: string]: string }>({});
+
+  useEffect(() => {
+    loadSavedEvents();
+  }, []);
+
+  const loadSavedEvents = async () => {
+    try {
+      const savedEvents = await AsyncStorage.getItem(`events_${destination.name}`);
+      if (savedEvents) {
+        setAddedEvents(JSON.parse(savedEvents));
+      }
+    } catch (error) {
+      console.error('Error loading saved events:', error);
+    }
+  };
+
+  const saveEvents = async (events: { [key: string]: string }) => {
+    try {
+      await AsyncStorage.setItem(`events_${destination.name}`, JSON.stringify(events));
+    } catch (error) {
+      console.error('Error saving events:', error);
+    }
+  };
 
   const handleAddToCalendar = async (date: string) => {
     try {
@@ -25,21 +50,45 @@ const DetailScreen: React.FC = () => {
         Alert.alert('Permission Denied', 'Calendar permission is required to add events.');
         return;
       }
-  
+
       const [startDate, endDate] = date.split(' - ').map(d => new Date(d));
-  
+
       const event: CalendarEvent = {
         title: `Trip to ${destination.name}`,
         location: destination.name,
         startDate,
         endDate: endDate || new Date(startDate.getTime() + 24 * 60 * 60 * 1000), 
       };
-  
-      await NativeCalendar.addEvent(event);
+
+      const eventId = await NativeCalendar.addEvent(event);
+      const newEvents = { ...addedEvents, [date]: eventId };
+      setAddedEvents(newEvents);
+      await saveEvents(newEvents);
       Alert.alert('Success', `Event added to calendar for ${date}`);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       Alert.alert('Error', `Failed to add event to calendar: ${errorMessage}`);
+      console.error('Calendar error:', error);
+    }
+  };
+
+  const handleDeleteEvent = async (date: string) => {
+    try {
+      const eventId = addedEvents[date];
+      if (!eventId) {
+        Alert.alert('Error', 'No event found for this date');
+        return;
+      }
+
+      await NativeCalendar.deleteEvent(eventId);
+      const newEvents = { ...addedEvents };
+      delete newEvents[date];
+      setAddedEvents(newEvents);
+      await saveEvents(newEvents);
+      Alert.alert('Success', `Event deleted from calendar for ${date}`);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      Alert.alert('Error', `Failed to delete event from calendar: ${errorMessage}`);
       console.error('Calendar error:', error);
     }
   };
@@ -82,7 +131,8 @@ const DetailScreen: React.FC = () => {
               key={index}
               date={date}
               index={index}
-              onPress={() => handleAddToCalendar(date)}
+              onPress={() => addedEvents[date] ? handleDeleteEvent(date) : handleAddToCalendar(date)}
+              isAdded={!!addedEvents[date]}
             />
           ))}
         </View>
